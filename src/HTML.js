@@ -46,7 +46,8 @@ export default class HTML extends PureComponent {
         ptSize: PropTypes.number.isRequired,
         baseFontStyle: PropTypes.object.isRequired,
         textSelectable: PropTypes.bool,
-        renderersProps: PropTypes.object
+        renderersProps: PropTypes.object,
+        textAllowFontScaling: PropTypes.bool
     }
 
     static defaultProps = {
@@ -62,7 +63,8 @@ export default class HTML extends PureComponent {
         baseFontStyle: { fontSize: 14 },
         tagsStyles: {},
         classesStyles: {},
-        textSelectable: false
+        textSelectable: false,
+        textAllowFontScaling: true
     }
 
     constructor (props) {
@@ -382,7 +384,7 @@ export default class HTML extends PureComponent {
      * @memberof HTML
      */
     renderRNElements (RNElements, parentWrapper = 'root', parentIndex = 0, props = this.props) {
-        const { tagsStyles, classesStyles, emSize, ptSize, ignoredStyles, allowedStyles, baseFontStyle } = props;
+        const { tagsStyles, classesStyles, emSize, ptSize, ignoredStyles, allowedStyles, baseFontStyle, textAllowFontScaling } = props;
         return RNElements && RNElements.length ? RNElements.map((element, index) => {
             const { attribs, data, tagName, parentTag, children, nodeIndex, wrapper } = element;
             const Wrapper = wrapper === 'Text' ? Text : View;
@@ -430,6 +432,7 @@ export default class HTML extends PureComponent {
             const classStyles = _getElementClassStyles(attribs, classesStyles);
             const textElement = data ?
                 <Text
+                  allowFontScaling={textAllowFontScaling}
                   style={computeTextStyles(
                       element,
                       {
@@ -458,6 +461,7 @@ export default class HTML extends PureComponent {
             const renderersProps = {};
             if (Wrapper === Text) {
                 renderersProps.selectable = this.props.textSelectable;
+                renderersProps.textAllowFontScaling = this.props.textAllowFontScaling;
             }
             return (
                 <Wrapper key={key} style={style} {...renderersProps}>
@@ -477,7 +481,7 @@ export default class HTML extends PureComponent {
             return remoteLoadingView ?
                 remoteLoadingView(this.props, this.state) :
                 (
-                    <View style={{ flex: 1, alignItems: 'center' }}>
+                    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                         <ActivityIndicator />
                     </View>
                 );
@@ -485,7 +489,7 @@ export default class HTML extends PureComponent {
             return remoteErrorView ?
                 remoteErrorView(this.props, this.state) :
                 (
-                    <View style={{ flex: 1, alignItems: 'center' }}>
+                    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                         <Text style={{ fontStyle: 'italic', fontSize: 16 }}>Could not load { this.props.uri }</Text>
                     </View>
                 );
